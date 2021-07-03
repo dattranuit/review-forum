@@ -7,6 +7,8 @@ import 'semantic-ui-css/semantic.min.css'
 import moment from 'moment';
 import Pagination from "react-js-pagination";
 import Loading from "./Loading";
+import {host} from "../constant"
+import Search from "./Search"
 const ListThread = () => {
 
     const [data, setData] = useState([]);
@@ -19,7 +21,7 @@ const ListThread = () => {
 
     const fetchData = (idCategory) => {
         
-        Promise.all([axios.get(`http://localhost:9999/api/threads/${idCategory}/categories`)])
+        Promise.all([axios.get(`${host}/api/threads/${idCategory}/categories`)])
             .then(([results]) => {
                 setData(results.data);
             })
@@ -27,7 +29,7 @@ const ListThread = () => {
     }
 
     const fetchUser = async () => {
-        let res = await axios.get(`http://localhost:9999/api/users/me`, { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
+        let res = await axios.get(`${host}/api/users/me`, { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
         if (res.data.code === -1)
             console.log('you not login')
         else {
@@ -39,8 +41,8 @@ const ListThread = () => {
     const axiosData = async (page=1) => {
         setIsLoading(true);
         //localStorage.setItem('current-page', page)
-        Promise.all([axios.get(`http://localhost:9999/api/categories/`),
-        axios.get(`http://localhost:9999/api/threads/?page=${page}&limit=10`)])
+        Promise.all([axios.get(`${host}/api/categories/`),
+        axios.get(`${host}/api/threads/?page=${page}&limit=10`)])
             .then(([categories, threads]) => {
                 setData(threads.data.threads);
                 setCategories(categories.data);
@@ -65,13 +67,13 @@ const ListThread = () => {
     }, []);
 
     const deleteThread = async (id) => {
-        let res = await axios.delete(`http://localhost:9999/api/threads/${id}`,
+        let res = await axios.delete(`${host}/api/threads/${id}`,
             { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
         axiosData();
     }
     const updateThread = async (id, status) => {
         console.log(status)
-        let res = await axios.put(`http://localhost:9999/api/threads/${id}`, { isOpen: !status },
+        let res = await axios.put(`${host}/api/threads/${id}`, { isOpen: !status },
             { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
         axiosData();
     }
@@ -83,10 +85,9 @@ const ListThread = () => {
     return (
         isLoading === true?<Loading isLoading={isLoading}/>
         :<Fragment>
-            {isLogin ? 
-            <Button style={{marginLeft: -350, marginTop: 5}}><Link to='/forum/new-thread'>New thread</Link></Button> : null}
-
             <Container>
+            {isLogin ? 
+            <Button style={{marginTop: 5, marginBottom: 5, marginLeft: 960}}><Link to='/forum/new-thread'>New thread</Link></Button> : null}
                 <div className="forumContainer">
                     <div className="category-filter">
                         <Dropdown
@@ -109,6 +110,7 @@ const ListThread = () => {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
+                    <Search data={data} />
                     <Segment.Group className="forum-list">
                         <Segment vertical>
                             <Grid textAlign="left" padded="horizontally">
@@ -144,7 +146,7 @@ const ListThread = () => {
                                                 <div className="forum-row">
                                                     <Link to="">
                                                         <Image className="forum-avatar" src={item.byUser.avatar !== undefined ? item.byUser.avatar :
-                                                            "https://st4.depositphotos.com/4329009/19956/v/380/depositphotos_199564354-stock-illustration-creative-vector-illustration-default-avatar.jpg"} />
+                                                            "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-portrait-176256935.jpg"} />
                                                     </Link>
 
                                                     <div className="forum-column">
