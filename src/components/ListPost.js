@@ -4,7 +4,7 @@ import { Row, Col, Card, Button, Form } from "react-bootstrap"
 import { useParams, Link } from "react-router-dom"
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { Redirect } from "react-router";
+//import { FroalaEditor } from "./FloaraEditor";
 import { Segment, Grid, Icon, Image, Dropdown, Container } from 'semantic-ui-react';
 import './ListPost.css'
 import 'semantic-ui-css/semantic.min.css'
@@ -28,6 +28,15 @@ const DetailsThread = () => {
     const [isLogin, setIsLogin] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rpShow, setRpShow] = useState(false);
+
+
+    // const [editor, setEditor] = useState("");
+    // const [editorContent, setEditorContent] = useState("");
+
+    // const handleEditor = (e) => {
+    //     console.log(e);
+    //     setEditor(e);
+    // }
 
     const axiosData = (page) => {
         setIsLoading(true);
@@ -149,6 +158,7 @@ const DetailsThread = () => {
         const data = document.querySelector(".data-content-".concat(id))
         setIdPost(id);
         setEditorHtml(data.innerHTML);
+        //setEditorContent(data.innerHTML);
     }
 
     const reply = (id, name) => {
@@ -159,8 +169,9 @@ const DetailsThread = () => {
         // const newData = ele.appendChild(data)
         let newData = "<blockquote>" + name + " said:" + editedData
             + "</blockquote>"
-        console.log(newData);
+        //console.log(newData);
         setEditorHtml(newData);
+        //setEditorContent(data.innerHTML);
     }
 
 
@@ -286,7 +297,7 @@ const DetailsThread = () => {
                     {userData.banned===true? <h3>You don't have permission to reply</h3>: dataThread.isOpen === false ? <h3>Thread closed</h3> :
                         isLogin === false ? <h3>You must login to reply this thread</h3> :
                             <Card>
-                                <span>Reply thread</span>
+                                <b>Reply thread</b>
                                 <ReactQuill
                                     id="htmlContent"
                                     theme="snow"
@@ -296,6 +307,7 @@ const DetailsThread = () => {
                                     formats={formats}
                                     placeholder="Content thread here..."
                                 />
+                                {/* <FroalaEditor stateUp={handleEditor} content={editorContent}/> */}
                                 <Form onSubmit={handleSubmit}>
                                     <Button variant="primary" type="submit">
                                         Submit

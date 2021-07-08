@@ -137,7 +137,8 @@ const FormThread = () => {
         isRedirect && gotoThread !== "1" ? <Redirect to={"/forum/thread/" + gotoThread} /> :
             <Fragment>
                 <Container>
-                    <Card className="new-thread">
+                <h3><b>New thread</b></h3>
+                    <Card className="new-thread">  
                         <Input placeholder="Title" ref={title}></Input>
                         <ReactTags
                             tags={tags.data}
