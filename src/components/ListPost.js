@@ -129,9 +129,19 @@ const DetailsThread = () => {
     }
 
     const deletePost = async (id) => {
-        let res = await axios.delete(`${host}/api/posts/${id}`, { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
+        let res = await axios.delete(`${host}/api/posts/${id}`, 
+        { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
         axiosData();
     }
+    // const reportPost  = async(id, reportedBy, reason) =>{
+    //     let res = await axios.post(`${host}/api/posts/${id}/report`,
+    //     data={
+    //         reportedBy:reportedBy,
+    //         reason:reason
+    //     },
+    //     {headers: { "x-access-token": localStorage.getItem('x-access-token') }} );
+
+    // }
 
     const editContent = (id) => {
         setEdit(true);
@@ -153,6 +163,7 @@ const DetailsThread = () => {
         setEditorHtml(newData);
     }
 
+
     const report = (id) => {
         setRpShow(!rpShow);
     }
@@ -161,38 +172,41 @@ const DetailsThread = () => {
     const handleCloseReport = () =>{
         setRpShow(false);
     }
-    const actions = (id, name, userLogin, userPost, idThread) => (
+    const actions = (id1, name, userLogin, userPost, idThread) => (
+        userLogin.banned === true? null:(
         <div className="post-dropdown">
             <Dropdown simple icon="caret down" direction="left">
                 <Dropdown.Menu>
+                    
                     {userLogin.permission === 1 || userLogin._id === userPost._id ?
                         <Dropdown.Item
-                            onClick={() => { deletePost(id) }}
+                            onClick={() => { deletePost(id1) }}
                             icon="delete"
                             text="Delete Post"
                         />
                         : null}
                     {userLogin._id === userPost._id ?
                         <Dropdown.Item
-                            onClick={() => { editContent(id) }}
+                            onClick={() => { editContent(id1) }}
                             icon="edit"
                             text="Edit Post"
                         /> : null
                     }
                     <Dropdown.Item
-                        onClick={() => { reply(id, name) }}
+                        onClick={() => { reply(id1, name) }}
                         icon="reply"
                         text="Reply"
                     />
-                    <Dropdown.Item
-                        onClick={() => { report(id) }}
+                    <ConfirmModal id= {id1} name = {userData.username} header={"Report"} trigger={<Dropdown.Item
+                        // onClick={() => { report(id) }}
                         icon="flag"
                         text="Report"
-                    />
+                    />}/>
+
                 </Dropdown.Menu>
             </Dropdown>
         </div>
-    );
+    ));
 
     return (
         isLoading === true ? <Loading isLoading={isLoading} />
@@ -203,9 +217,7 @@ const DetailsThread = () => {
                     </div>
                 </div>
                 <Container>
-                    {rpShow ===true?<ConfirmModal header="Report" content="Are you sure?"
-                     handleConfirm={report} handleCancel={handleCloseReport}>
-                    </ConfirmModal>:null}
+                
                     {data.map((item, index) =>
                         item.isDeleted === false ?
                             (
@@ -230,7 +242,7 @@ const DetailsThread = () => {
                                                     <div className="post-status">
                                                         {item.byUser.permission === 1 ?
                                                             <b className="staff">{'(Admin) '}</b>
-                                                            : "Member"}
+                                                            : item.byUser.banned === true?<s className="banned">Banned</s>:"Member"}
                                                     </div>
                                                 </div>
                                                 {/* </div> */}
@@ -257,7 +269,7 @@ const DetailsThread = () => {
                                     </Grid>
                                 </Segment>
                             </div>)}
-                    <div style={{ float: 'right', paddingTop: 15, paddingBottom: 15 }}>
+                    <div style={{ paddingLeft:900,  paddingTop: 15, paddingBottom: 15 }}>
                         <Pagination
                             activePage={curPage}
                             itemsCountPerPage={10}
@@ -271,7 +283,7 @@ const DetailsThread = () => {
                 </Container>
 
                 <Container>
-                    {dataThread.isOpen === false ? <h3>Thread closed</h3> :
+                    {userData.banned===true? <h3>You don't have permission to reply</h3>: dataThread.isOpen === false ? <h3>Thread closed</h3> :
                         isLogin === false ? <h3>You must login to reply this thread</h3> :
                             <Card>
                                 <span>Reply thread</span>

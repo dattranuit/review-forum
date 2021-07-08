@@ -60,7 +60,7 @@ export const FroalaEditor = ({stateUp, content}) => {
       <Froala
         ref={ref}
         model={model}
-        onModelChange={handleModelChange2}
+        onModelChange={handleModelChange}
         tag="textarea"
         config={{
           attribution: false,

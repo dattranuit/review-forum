@@ -17,11 +17,12 @@ const FormThread = () => {
     var listCategory = [];
     const title = useRef();
     const [editor, setEditor] = useState("");
-    let select = "";
+    const [select,setSelect] = useState("");
     const [suggestions, setSuggest] = useState([])
     const [gotoThread, setGotoThread] = useState("1")
 
     const handleEditor = (e) => {
+        //console.log(e)
         setEditor(e);
     }
 
@@ -50,7 +51,7 @@ const FormThread = () => {
                 tagName: item
             }
         });
-        console.log(title.current.inputRef.current.value);
+        //console.log(editor);
 
         let res = await axios.post(`http://localhost:9999/api/threads/`, {
             title: title.current.inputRef.current.value,
@@ -72,9 +73,8 @@ const FormThread = () => {
 
     }
 
-
     const handleSelect = (e, data) => {
-        select = data.value;
+        setSelect(data.value);
     }
 
     const KeyCodes = {
@@ -101,7 +101,6 @@ const FormThread = () => {
 
         newTags.splice(currPos, 1);
         newTags.splice(newPos, 0, tag);
-
         // re-render
         setTags({ data: newTags, suggestion: suggestions });
     }
@@ -149,7 +148,7 @@ const FormThread = () => {
                             handleDrag={handleDrag}
                             inputFieldPosition="inline"
                             autocomplete
-                            autofocus={false}
+                            autofocus={true}
                             maxLength={15}
                         />
 

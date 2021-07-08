@@ -182,9 +182,14 @@
     font-family:Open Sans;
     font-style:italic;
     color: #555555;
-    border-left:8px solid #ff9901 ;
+    border-left:5px solid #ff9901 ;
     line-height:1.6;
     position: relative;
     background:#EDEDED;
+  }
+  .banned {
+    font-size: 14px; 
+    color: black;
+    font-weight: bold;
   }
   

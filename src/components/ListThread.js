@@ -18,12 +18,17 @@ const ListThread = () => {
     const [numDoc, setNumDoc] = useState(0);
     const [curPage, setCurPage] = useState();
     const [isLoading, setIsLoading] = useState(false);
+    const [dataSearch, setDataSearch] = useState({});
 
-    const fetchData = (idCategory) => {
-        
-        Promise.all([axios.get(`${host}/api/threads/${idCategory}/categories`)])
+    const fetchData = (idCategory, page=1) => {
+        setIsLoading(true);
+        Promise.all([axios.get(`${host}/api/threads/${idCategory}/categories?page=${page}&limit=10`)])
             .then(([results]) => {
-                setData(results.data);
+                setData(results.data.threads);
+                setNumDoc(results.data.numDoc);
+                setCurPage(page);
+                localStorage.setItem('current-page', page)
+                setIsLoading(false);
             })
             .catch()
     }
@@ -42,8 +47,9 @@ const ListThread = () => {
         setIsLoading(true);
         //localStorage.setItem('current-page', page)
         Promise.all([axios.get(`${host}/api/categories/`),
-        axios.get(`${host}/api/threads/?page=${page}&limit=10`)])
-            .then(([categories, threads]) => {
+        axios.get(`${host}/api/threads/?page=${page}&limit=10`), axios.get(`${host}/api/threads/all`)])
+            .then(([categories, threads,allSearch]) => {
+                setDataSearch(allSearch.data);
                 setData(threads.data.threads);
                 setCategories(categories.data);
                 setNumDoc(threads.data.numDoc);
@@ -66,16 +72,16 @@ const ListThread = () => {
         //console.log(curPage)
     }, []);
 
-    const deleteThread = async (id) => {
-        let res = await axios.delete(`${host}/api/threads/${id}`,
+    const deleteThread = async (id1) => {
+        let res = await axios.delete(`${host}/api/threads/${id1}`,
             { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
-        axiosData();
+        axiosData(curPage);
     }
-    const updateThread = async (id, status) => {
+    const updateThread = async (id1, status) => {
         console.log(status)
-        let res = await axios.put(`${host}/api/threads/${id}`, { isOpen: !status },
+        let res = await axios.put(`${host}/api/threads/${id1}`, { isOpen: !status },
             { headers: { "x-access-token": localStorage.getItem('x-access-token') } });
-        axiosData();
+        axiosData(curPage);
     }
     const handleFilterCategory = (e, data) => {
         fetchData(data.children.key)
@@ -86,7 +92,7 @@ const ListThread = () => {
         isLoading === true?<Loading isLoading={isLoading}/>
         :<Fragment>
             <Container>
-            {isLogin ? 
+            {isLogin && !userData.banned? 
             <Button style={{marginTop: 5, marginBottom: 5, marginLeft: 960}}><Link to='/forum/new-thread'>New thread</Link></Button> : null}
                 <div className="forumContainer">
                     <div className="category-filter">
@@ -110,7 +116,7 @@ const ListThread = () => {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    <Search data={data} />
+                    <Search data={dataSearch} />
                     <Segment.Group className="forum-list">
                         <Segment vertical>
                             <Grid textAlign="left" padded="horizontally">

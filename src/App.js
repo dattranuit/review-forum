@@ -6,11 +6,12 @@ import NewThread from './components/NewThread'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom';
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Fragment } from 'react';
 function App() {
   return (
-    <div>
-      <Navbar/>
+    <Fragment>
       <BrowserRouter>
+      <Navbar />
         <Switch>
           <div className="container">
             <Route exact path="/forum/thread/:id" component={Post}></Route>
@@ -19,9 +20,9 @@ function App() {
             {/* <Redirect from="/" to="/forum/" /> */}
           </div>
         </Switch>
+        {/* <Footer /> */}
       </BrowserRouter>
-      <Footer/>
-    </div>
+    </Fragment>
   );
 }
 

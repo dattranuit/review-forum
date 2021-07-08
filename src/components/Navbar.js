@@ -1,12 +1,17 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useRef } from "react";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
-import "./Navbar.css";
-import axios from "axios";
+import { Modal, Form, Input, Button } from 'semantic-ui-react'
+import axios from 'axios'
 import { host } from "../constant"
+import "./Navbar.css";
 const NavbarCom = () => {
 
   const [userInfo, setUserInfo] = useState();
   const [isLogin, setIsLogin] = useState(false);
+  const [open, setOpen] = React.useState(false);
+
+  const refEmail = useRef();
+  const refPassword = useRef();
 
   const fetchData = async () => {
     const res = await axios.get(`${host}/api/users/me`, {
@@ -26,6 +31,74 @@ const NavbarCom = () => {
     fetchData();
   }, [])
 
+  const handleLogout = () => {
+    //setIsLogin(false);
+    localStorage.removeItem('x-access-token');
+    window.location.reload();
+  }
+
+  const handleLogin = async () => {
+    const res = await axios.post(`${host}/api/users/login`, {
+      email: refEmail.current.inputRef.current.value,
+      password: refPassword.current.inputRef.current.value,
+    });
+    if(res.headers['x-access-token']){
+      //setIsLogin(true);
+      localStorage.setItem('x-access-token', res.headers['x-access-token'])
+      window.location.reload();
+      //fetchData();
+    } else {
+      alert("Tài khoản hoặc mật khẩu không đúng")
+    }
+  }
+  const Login = ({trigger}) => {
+
+    return (
+      <Modal
+        centered={true}
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        open={open}
+        trigger={trigger}
+        size={"mini"}
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginRight: '-50%',
+          transform: "translate(-50%, -50%)",
+          height: 250
+        }}
+      >
+        <Modal.Header>Login</Modal.Header>
+        <Modal.Content>
+          <Modal.Description>
+            <Form>
+              <Input label="Email" type="text" size="small"
+              ref={refEmail} placeholder='Type email...' />
+              <br></br>
+              <br></br>
+              <Input label="Password  " type="password" size="small" 
+              ref={refPassword} placeholder='Type password...' />
+            </Form>
+          </Modal.Description>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button color='black' onClick={() => setOpen(false)}>
+            Close
+          </Button>
+          <Button
+            content="Login"
+            labelPosition='right'
+            onClick={handleLogin}
+            icon
+          />
+        </Modal.Actions>
+      </Modal>
+    )
+  }
+
+
   return (
     <div>
       <Navbar bg="light" expand="lg">
@@ -34,14 +107,6 @@ const NavbarCom = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-            </NavDropdown>
           </Nav>
           <Nav style={{ marginRight: 100 }}>
 
@@ -55,9 +120,12 @@ const NavbarCom = () => {
               </div>
             </Nav>
             <Nav style={{ marginRight: 50 }}>
-              <Nav.Link href="#link">Logout</Nav.Link>
+              <a href="#" onClick={handleLogout}>Logout</a>
             </Nav>
-          </Fragment> : null}
+          </Fragment> :
+            <Nav style={{ marginRight: 50 }}>
+              <Login trigger={<a href="#" >Login</a>} />
+            </Nav>}
         </Navbar.Collapse>
       </Navbar>
     </div >
